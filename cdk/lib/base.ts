@@ -29,7 +29,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
     this.props = props;
     const vpc = new ec2.Vpc(this, 'CloudGamingVPC', {
       ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'),
-      maxAzs: 1,
+      availabilityZones: ['ap-southeast-1c'],
       subnetConfiguration: [
         {
           cidrMask: 28,
@@ -87,6 +87,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
           deviceName: '/dev/sda1',
           volume: ec2.BlockDeviceVolume.ebs(props.volumeSizeGiB, {
             volumeType: ec2.EbsDeviceVolumeType.GP3,
+            throughput: 500,
           }),
         },
       ],
@@ -172,6 +173,17 @@ export abstract class BaseEc2Stack extends cdk.Stack {
     });
     // Needed as cdk created hashed LogicalID and CFN signal does not work after reboot, so we have to hardcode the Logical Name in the signal (line #136)
     ec2Instance.instance.overrideLogicalId('EC2Instance');
+
+    const spotTemplate = new ec2.LaunchTemplate(this, 'SpotTemplate', {
+      spotOptions: {
+        requestType: ec2.SpotRequestType.ONE_TIME,
+        interruptionBehavior: ec2.SpotInstanceInterruption.TERMINATE,
+      },
+    });
+    ec2Instance.instance.launchTemplate = {
+      launchTemplateId: spotTemplate.launchTemplateId,
+      version: spotTemplate.latestVersionNumber,
+    };
 
     if (this.props.associateElasticIp) {
       const elasticIp = new ec2.CfnEIP(this, 'Gaming', {
