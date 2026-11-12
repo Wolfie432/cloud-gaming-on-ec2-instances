@@ -20,12 +20,12 @@ const SEVEN_ZIP_URL = 'https://7-zip.org/a/7z2409-x64.msi';
 
 
 
-const EC2_KEYPAIR_NAME = 'CHANGE_ME';
+const EC2_KEYPAIR_NAME = process.env.EC2_KEYPAIR_NAME;
 const VOLUME_SIZE_GIB = 200;
 const OPEN_PORTS = [8443];
 const ALLOW_INBOUND_CIDR = '0.0.0.0/0';
-const ACCOUNT_ID = 'CHANGE_ME';
-const REGION = 'us-east-1';
+const ACCOUNT_ID = process.env.ACCOUNT_ID;
+const REGION = process.env.REGION;
 
 new G4DNStack(app, 'CloudGamingsOnG4DN', {
   niceDCVDisplayDriverUrl: NICE_DCV_DISPLAY_DRIVER_URL,
