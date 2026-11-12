@@ -22,3 +22,17 @@ phases:
 
       - echo "Deploying stack CloudGamingsOnG4DN..."
       - cdk deploy CloudGamingsOnG4DN --require-approval never
+
+  post_build:
+    commands:
+      - |
+        if [ "$CODEBUILD_BUILD_SUCCEEDING" = "0" ]; then
+          echo "=================================================================="
+          echo "❌ ALERT: CDK Deployment or Build FAILED!"
+          echo "👉 Please check the detailed error logs printed above to debug."
+          echo "=================================================================="
+        else
+          echo "=================================================================="
+          echo "✅ SUCCESS: CDK Deployment completed successfully!"
+          echo "=================================================================="
+        fi
