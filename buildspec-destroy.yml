@@ -10,4 +10,4 @@ phases:
       - cd cdk
       - npm install
       - echo "Destroying stack CloudGamingsOnG4DN..."
-      - cdk destroy CloudGamingsOnG4DN --require-approval never
+      - cdk destroy CloudGamingsOnG4DN --force
