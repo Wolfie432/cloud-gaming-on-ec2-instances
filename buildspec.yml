@@ -28,11 +28,11 @@ phases:
       - |
         if [ "$CODEBUILD_BUILD_SUCCEEDING" = "0" ]; then
           echo "=================================================================="
-          echo "❌ ALERT: CDK Deployment or Build FAILED!"
+          echo "❌ ALERT: CDK Deployment or Build FAILED!: $USER_EMAIL"
           echo "👉 Please check the detailed error logs printed above to debug."
           echo "=================================================================="
         else
           echo "=================================================================="
-          echo "✅ SUCCESS: CDK Deployment completed successfully!"
+          echo "✅ SUCCESS: CDK Deployment completed successfully!: $USER_EMAIL"
           echo "=================================================================="
         fi
