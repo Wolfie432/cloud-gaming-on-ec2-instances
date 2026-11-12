@@ -1,0 +1,13 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing global AWS CDK CLI..."
+      - npm install -g aws-cdk
+  build:
+    commands:
+      - cd cdk
+      - npm install
+      - echo "Destroying stack CloudGamingsOnG4DN..."
+      - cdk destroy CloudGamingsOnG4DN --require-approval never
