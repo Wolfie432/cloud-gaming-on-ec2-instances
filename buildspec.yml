@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "Installing global AWS CDK CLI..."
+      - npm install -g aws-cdk
+
+  build:
+    commands:
+      - echo "Navigating to cdk directory..."
+      - cd cdk
+
+      - echo "Installing dependencies..."
+      - npm install
+
+      - echo "Bootstrapping CDK environment for Account $ACCOUNT_ID in $REGION..."
+      - cdk bootstrap aws://$ACCOUNT_ID/$REGION
+
+      - echo "Deploying stack CloudGamingsOnG4DN..."
+      - cdk deploy CloudGamingsOnG4DN --require-approval never
