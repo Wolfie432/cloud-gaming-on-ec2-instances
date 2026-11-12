@@ -87,7 +87,6 @@ export abstract class BaseEc2Stack extends cdk.Stack {
           deviceName: '/dev/sda1',
           volume: ec2.BlockDeviceVolume.ebs(props.volumeSizeGiB, {
             volumeType: ec2.EbsDeviceVolumeType.GP3,
-            throughput: 500,
           }),
         },
       ],
@@ -179,6 +178,16 @@ export abstract class BaseEc2Stack extends cdk.Stack {
         requestType: ec2.SpotRequestType.ONE_TIME,
         interruptionBehavior: ec2.SpotInstanceInterruption.TERMINATE,
       },
+      blockDevices: [
+        {
+          deviceName: '/dev/sda1',
+          volume: ec2.BlockDeviceVolume.ebs(props.volumeSizeGiB, {
+            volumeType: ec2.EbsDeviceVolumeType.GP3,
+            throughput: 300,
+            iops: 4000,
+          }),
+        },
+      ],
     });
     ec2Instance.instance.launchTemplate = {
       launchTemplateId: spotTemplate.launchTemplateId,
