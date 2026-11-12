@@ -2,9 +2,10 @@ version: 0.2
 
 phases:
   install:
-    runtime-versions:
-      nodejs: 18
     commands:
+      - echo "Checking pre-installed Node version..."
+      - node -v
+      - npm -v
       - echo "Installing global AWS CDK CLI..."
       - npm install -g aws-cdk
 
