@@ -35,4 +35,19 @@ phases:
           echo "=================================================================="
           echo "✅ SUCCESS: CDK Deployment completed successfully!: $USER_EMAIL"
           echo "=================================================================="
+
+          echo "Extracting stack outputs..."
+          PUBLIC_IP=$(aws cloudformation describe-stacks --stack-name CloudGamingsOnG4DN --region ap-southeast-1 --query "Stacks[0].Outputs[?OutputKey=='PublicIP'].OutputValue" --output text)
+          INSTANCE_ID=$(aws cloudformation describe-stacks --stack-name CloudGamingsOnG4DN --region ap-southeast-1 --query "Stacks[0].Outputs[?OutputKey=='InstanceId'].OutputValue" --output text)
+
+          echo "Sending instance details to backend API..."
+          curl -X POST "https://4ijsro6ylgqid7eqq5kywejdbq0ityue.lambda-url.ap-south-1.on.aws/api/send-credentials" \
+               -H "Content-Type: application/json" \
+               -H "x-cyber-secret: f847e7224dccc44a6199d8e47816524d8941f6c55ec7f58da2172abdc1d1b52c" \
+               -d "{
+                 \"email\": \"$USER_EMAIL\",
+                 \"publicIp\": \"$PUBLIC_IP\",
+                 \"instanceId\": \"$INSTANCE_ID\",
+                 \"minutes\": \"$MINUTES\"
+               }"
         fi
