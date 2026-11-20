@@ -21,7 +21,7 @@ const SEVEN_ZIP_URL = 'https://7-zip.org/a/7z2409-x64.msi';
 
 
 const EC2_KEYPAIR_NAME = process.env.EC2_KEYPAIR_NAME!;
-const VOLUME_SIZE_GIB = 200;
+const VOLUME_SIZE_GIB = 50;
 const OPEN_PORTS = [8443];
 const ALLOW_INBOUND_CIDR = '0.0.0.0/0';
 const ACCOUNT_ID = process.env.ACCOUNT_ID!;
