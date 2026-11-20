@@ -29,7 +29,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
     this.props = props;
     const vpc = new ec2.Vpc(this, 'CloudGamingVPC', {
       ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'),
-      availabilityZones: ['ap-southeast-1c'],
+      availabilityZones: ['ap-southeast-1b'],
       subnetConfiguration: [
         {
           cidrMask: 28,
@@ -94,10 +94,22 @@ export abstract class BaseEc2Stack extends cdk.Stack {
       init: ec2.CloudFormationInit.fromConfigSets({
         configSets: { 
           // Seperate configSets and specific order depending on EC2 Instance Type
-          NVIDIA: ['helpersPreinstall', 'nvidia', 'nvidiadcv', 'reboot'],
-          AMD: ['helpersPreinstall', 'amd', 'amddcv', 'reboot'],
+          NVIDIA: ['helpersPreinstall', 'nvidia', 'nvidiadcv', 'instanceStore', 'reboot'],
+          AMD: ['helpersPreinstall', 'amd', 'amddcv', 'instanceStore', 'reboot'],
         },
         configs: {
+          instanceStore: new ec2.InitConfig([
+          ec2.InitFile.fromString('C:\\scripts\\init-instance-store.ps1', [
+            "$disk = Get-Disk | Where-Object { $_.BusType -eq 'NVMe' -and $_.PartitionStyle -eq 'RAW' } | Select-Object -First 1",
+            'if ($disk) {',
+            '  if ($disk.IsOffline) { Set-Disk -Number $disk.Number -IsOffline $false }',
+            '  Initialize-Disk -Number $disk.Number -PartitionStyle GPT',
+            "  New-Partition -DiskNumber $disk.Number -UseMaximumSize -DriveLetter D | Format-Volume -FileSystem NTFS -NewFileSystemLabel 'StorageDrive' -Confirm:$false",
+            '}',
+          ].join('\r\n')),
+            ec2.InitCommand.shellCommand('schtasks /create /tn InitInstanceStore /sc onstart /ru SYSTEM /rl HIGHEST /tr "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\\scripts\\init-instance-store.ps1" /f', { key: '00-Register-Task', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
+            ec2.InitCommand.shellCommand('powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\\scripts\\init-instance-store.ps1', { key: '01-Init-Now', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
+          ]),
           helpersPreinstall: new ec2.InitConfig([
             // Installes 7zip, needed for Nvidia install, and Chrome Enterprise.
             ec2.InitPackage.msi(this.props.sevenZipUrl, { key: '1-Install-SevenZip' }),
@@ -178,16 +190,6 @@ export abstract class BaseEc2Stack extends cdk.Stack {
         requestType: ec2.SpotRequestType.ONE_TIME,
         interruptionBehavior: ec2.SpotInstanceInterruption.TERMINATE,
       },
-      blockDevices: [
-        {
-          deviceName: '/dev/sda1',
-          volume: ec2.BlockDeviceVolume.ebs(props.volumeSizeGiB, {
-            volumeType: ec2.EbsDeviceVolumeType.GP3,
-            throughput: 300,
-            iops: 4000,
-          }),
-        },
-      ],
     });
     ec2Instance.instance.launchTemplate = {
       launchTemplateId: spotTemplate.launchTemplateId,
