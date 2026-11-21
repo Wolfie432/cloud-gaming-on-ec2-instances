@@ -31,6 +31,14 @@ phases:
           echo "❌ ALERT: CDK Deployment or Build FAILED!: $USER_EMAIL"
           echo "👉 Please check the detailed error logs printed above to debug."
           echo "=================================================================="
+
+          curl --location 'https://4ijsro6ylgqid7eqq5kywejdbq0ityue.lambda-url.ap-south-1.on.aws/api/set-ec-deployment-status' \
+               --header 'Content-Type: application/json' \
+               --header 'x-cyber-secret: f847e7224dccc44a6199d8e47816524d8941f6c55ec7f58da2172abdc1d1b52c' \
+               --data-raw "{
+                 \"email\": \"$USER_EMAIL\",
+                 \"isProgress\": false
+               }"
         else
           echo "=================================================================="
           echo "✅ SUCCESS: CDK Deployment completed successfully!: $USER_EMAIL"
