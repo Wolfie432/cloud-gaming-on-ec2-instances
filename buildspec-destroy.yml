@@ -13,9 +13,9 @@ phases:
       - cdk destroy CloudGamingsOnG4DN --force
   post_build:
     commands:
-      - echo "=================================================================="
-      - echo "Setting deployment status as false for: $USER_EMAIL"
-      - echo "=================================================================="
+      - 'echo "=================================================================="'
+      - 'echo "Setting deployment status as false for: $USER_EMAIL"'
+      - 'echo "=================================================================="'
       - |
         curl --location 'https://4ijsro6ylgqid7eqq5kywejdbq0ityue.lambda-url.ap-south-1.on.aws/api/set-ec-deployment-status' \
           --header 'Content-Type: application/json' \
