@@ -29,7 +29,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
     this.props = props;
     const vpc = new ec2.Vpc(this, 'CloudGamingVPC', {
       ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'),
-      availabilityZones: ['ap-southeast-1b'],
+      availabilityZones: ['ap-southeast-1c'],
       subnetConfiguration: [
         {
           cidrMask: 28,
